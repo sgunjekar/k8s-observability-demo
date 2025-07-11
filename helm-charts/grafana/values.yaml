@@ -1,0 +1,5 @@
+dashboards:
+  enabled: true
+sidecar:
+  dashboards:
+    enabled: true

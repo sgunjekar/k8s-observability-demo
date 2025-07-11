@@ -1,0 +1,8 @@
+metrics_generator:
+  enabled: true
+  service_graph:
+    enabled: true
+search:
+  enabled: true
+traceql:
+  enabled: true

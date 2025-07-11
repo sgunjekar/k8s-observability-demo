@@ -1,0 +1,19 @@
+{
+  "title": "MongoDB Observability Demo",
+  "schemaVersion": 30,
+  "version": 1,
+  "panels": [
+    {
+      "type": "logs",
+      "title": "MongoDB Error Logs",
+      "datasource": "Loki",
+      "targets": [
+        {
+          "expr": "{app=\"user-service\"} |= \"[ERROR]\"",
+          "refId": "A"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 10 }
+    }
+  ]
+}

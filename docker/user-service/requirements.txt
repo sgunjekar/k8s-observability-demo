@@ -1,0 +1,3 @@
+pymongo
+opentelemetry-api
+opentelemetry-sdk

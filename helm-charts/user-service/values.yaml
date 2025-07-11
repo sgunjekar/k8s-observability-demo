@@ -1,0 +1,12 @@
+replicaCount: 1
+
+image:
+  repository: your-registry/user-service
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources: {}
