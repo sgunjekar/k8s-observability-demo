@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: sgunjekar/payment-service
-  tag: latest
+  repository: sushilg/sgunjekar
+  tag: payment-service-latest
 
 service:
   port: 5000
@@ -10,3 +10,5 @@ service:
 env:
   DB_USERNAME: vault-username-placeholder
   DB_PASSWORD: vault-password-placeholder
+
+  

@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: sushilg/sgunjekar
-  tag: user-service-latest
+  tag: order-service-latest
   pullPolicy: IfNotPresent
 
 service:

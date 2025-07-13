@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: sgunjekar/inventory-service
-  tag: latest
+  repository: sushilg/sgunjekar
+  tag: inventory-service-latest
   pullPolicy: IfNotPresent
 
 service:
