@@ -25,25 +25,37 @@ user-service:
   stage: build
   variables:
     SERVICE_NAME: "sgunjekar-user-service"
-  <<: *default-job-template
+  before_script: *default-job-template.before_script
+  script: *default-job-template.script
+  artifacts: *default-job-template.artifacts
+  only: *default-job-template.only
 
 order-service:
   stage: build
   variables:
     SERVICE_NAME: "sgunjekar-order-service"
-  <<: *default-job-template
+  before_script: *default-job-template.before_script
+  script: *default-job-template.script
+  artifacts: *default-job-template.artifacts
+  only: *default-job-template.only
 
 payment-service:
   stage: build
   variables:
     SERVICE_NAME: "sgunjekar-payment-service"
-  <<: *default-job-template
+  before_script: *default-job-template.before_script
+  script: *default-job-template.script
+  artifacts: *default-job-template.artifacts
+  only: *default-job-template.only
 
 inventory-service:
   stage: build
   variables:
     SERVICE_NAME: "sgunjekar-inventory-service"
-  <<: *default-job-template
+  before_script: *default-job-template.before_script
+  script: *default-job-template.script
+  artifacts: *default-job-template.artifacts
+  only: *default-job-template.only
 
 commit-updated-tags:
   stage: commit
