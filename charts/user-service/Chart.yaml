@@ -1,7 +1,6 @@
-# Placeholder for Chart.yaml
 apiVersion: v2
 name: user-service
-description: A Helm chart for deploying the user-service Flask app with MongoDB
+description: A Helm chart for order microservice
 type: application
 version: 0.1.0
 appVersion: "1.0"
