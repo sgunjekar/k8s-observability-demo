@@ -5,16 +5,15 @@ stages:
 variables:
   DOCKER_REGISTRY: docker.io
   DOCKER_REGISTRY_USER: "sushilg"
-  DOCKER_REGISTRY_PASSWORD: "Mojo#11#11"  # 🔒 For testing only
-  DOCKER_IMAGE_PREFIX: "sgunjekar"
-  COMMIT_TAG: "user-service-latest"  # Use the same tag across services for simplicity
+  DOCKER_REGISTRY_PASSWORD: "Mojo#11#11"
+  COMMIT_TAG: "user-service-latest"
 
 .default-job-template: &default-job-template
   before_script:
     - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USER" --password-stdin $DOCKER_REGISTRY
   script:
-    - docker build -t $DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/$DOCKER_IMAGE_PREFIX/$SERVICE_NAME:$COMMIT_TAG apps/$SERVICE_NAME
-    - docker push $DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/$DOCKER_IMAGE_PREFIX/$SERVICE_NAME:$COMMIT_TAG
+    - docker build -t $DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/$SERVICE_NAME:$COMMIT_TAG apps/$SERVICE_NAME
+    - docker push $DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/$SERVICE_NAME:$COMMIT_TAG
     - sed -i "s|tag:.*|tag: $COMMIT_TAG|" charts/$SERVICE_NAME/values.yaml
   artifacts:
     paths:
@@ -25,25 +24,25 @@ variables:
 user-service:
   stage: build
   variables:
-    SERVICE_NAME: "user-service"
+    SERVICE_NAME: "sgunjekar-user-service"
   <<: *default-job-template
 
 order-service:
   stage: build
   variables:
-    SERVICE_NAME: "order-service"
+    SERVICE_NAME: "sgunjekar-order-service"
   <<: *default-job-template
 
 payment-service:
   stage: build
   variables:
-    SERVICE_NAME: "payment-service"
+    SERVICE_NAME: "sgunjekar-payment-service"
   <<: *default-job-template
 
 inventory-service:
   stage: build
   variables:
-    SERVICE_NAME: "inventory-service"
+    SERVICE_NAME: "sgunjekar-inventory-service"
   <<: *default-job-template
 
 commit-updated-tags:
