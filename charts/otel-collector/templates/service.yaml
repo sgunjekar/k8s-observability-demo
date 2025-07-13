@@ -1,0 +1,8 @@
+# charts/otel-collector/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+data:
+  config.yaml: |
+{{ .Files.Get "otel-config.yaml" | indent 4 }}

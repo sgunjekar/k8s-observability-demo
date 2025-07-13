@@ -1,0 +1,15 @@
+replicaCount: 1
+
+image:
+  repository: otel/opentelemetry-collector
+  tag: 0.81.0
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 4317
+
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

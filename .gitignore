@@ -1,0 +1,34 @@
+# Placeholder for .gitignore
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Logs
+*.log
+
+# Docker
+*.tar
+*.env
+.env
+
+# Terraform
+.terraform/
+terraform.tfstate*
+*.tfvars
+
+# Kubernetes
+*.yaml~
+*.yml~
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

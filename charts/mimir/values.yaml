@@ -1,0 +1,16 @@
+mimir:
+  structuredConfig:
+    multitenancy_enabled: false
+    blocks_storage:
+      backend: filesystem
+      filesystem:
+        dir: /data/mimir
+    compactor:
+      data_dir: /data/mimir
+  persistence:
+    enabled: true
+    size: 10Gi
+
+service:
+  type: ClusterIP
+  port: 9009

@@ -1,0 +1,12 @@
+replicaCount: 1
+
+image:
+  repository: sgunjekar/inventory-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8002
+
+resources: {}

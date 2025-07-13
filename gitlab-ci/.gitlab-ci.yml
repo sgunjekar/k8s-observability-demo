@@ -1,0 +1,65 @@
+# .gitlab-ci.yml
+
+stages:
+  - build
+  - push
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: $CI_REGISTRY
+  DOCKER_REGISTRY_USER: $CI_REGISTRY_USER
+  DOCKER_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  VAULT_ADDR: http://vault.default.svc.cluster.local:8200
+
+.default-job-template: &default-job-template
+  before_script:
+    - echo "Authenticating with Vault"
+    - apk add --no-cache curl jq
+    - |
+      VAULT_TOKEN=$(curl --request POST --data '{"jwt": "'$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)'", "role": "'$SERVICE_NAME'"}' \
+        $VAULT_ADDR/v1/auth/kubernetes/login | jq -r .auth.client_token)
+      export DB_USERNAME=$(curl -s --header "X-Vault-Token: $VAULT_TOKEN" $VAULT_ADDR/v1/secret/data/$SERVICE_NAME/config | jq -r .data.data.DB_USERNAME)
+      export DB_PASSWORD=$(curl -s --header "X-Vault-Token: $VAULT_TOKEN" $VAULT_ADDR/v1/secret/data/$SERVICE_NAME/config | jq -r .data.data.DB_PASSWORD)
+  script:
+    - docker build -t $DOCKER_REGISTRY/$SERVICE_NAME:$CI_COMMIT_SHORT_SHA apps/$SERVICE_NAME
+    - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USER --password-stdin $DOCKER_REGISTRY
+    - docker push $DOCKER_REGISTRY/$SERVICE_NAME:$CI_COMMIT_SHORT_SHA
+    - helm upgrade --install $SERVICE_NAME charts/$SERVICE_NAME \
+        --namespace default \
+        --set image.tag=$CI_COMMIT_SHORT_SHA \
+        --set env.DB_USERNAME=$DB_USERNAME \
+        --set env.DB_PASSWORD=$DB_PASSWORD
+  only:
+    - main
+
+user-service:
+  stage: deploy
+  variables:
+    SERVICE_NAME: "user-service"
+  <<: *default-job-template
+
+order-service:
+  stage: deploy
+  variables:
+    SERVICE_NAME: "order-service"
+  <<: *default-job-template
+
+payment-service:
+  stage: deploy
+  variables:
+    SERVICE_NAME: "payment-service"
+  <<: *default-job-template
+
+inventory-service:
+  stage: deploy
+  variables:
+    SERVICE_NAME: "inventory-service"
+  <<: *default-job-template
+# To consume DB_USERNAME and DB_PASSWORD in Helm templates:
+# In charts/*/templates/deployment.yaml
+#
+# env:
+#   - name: DB_USERNAME
+#     value: {{ .Values.env.DB_USERNAME | quote }}
+#   - name: DB_PASSWORD
+#     value: {{ .Values.env.DB_PASSWORD | quote }}

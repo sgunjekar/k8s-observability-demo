@@ -1,0 +1,45 @@
+# Placeholder for config.yaml
+# OpenTelemetry Collector configuration
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+  filelog:
+    include: [ /var/log/myapp/*.log ]
+    start_at: beginning
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'user-service'
+          static_configs:
+            - targets: ['user-service.default.svc:8000']
+
+exporters:
+  logging:
+    loglevel: debug
+  otlp:
+    endpoint: ${TEMPO_ENDPOINT}
+    tls:
+      insecure: true
+  loki:
+    endpoint: ${LOKI_ENDPOINT}
+
+processors:
+  batch:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp]
+    logs:
+      receivers: [filelog]
+      processors: [batch]
+      exporters: [logging, loki]
+    metrics:
+      receivers: [prometheus]
+      processors: [batch]
+      exporters: [logging]

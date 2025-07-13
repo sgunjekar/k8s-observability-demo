@@ -1,0 +1,7 @@
+# Placeholder for Chart.yaml
+apiVersion: v2
+name: grafana
+description: Helm chart for Grafana to visualize metrics, logs, and traces
+type: application
+version: 0.1.0
+appVersion: "10.0"

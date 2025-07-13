@@ -1,0 +1,9 @@
+# observability/fluent-bit/fluent-bit-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: default
+data:
+  fluent-bit.conf: |
+    @INCLUDE fluent-bit-config.yaml

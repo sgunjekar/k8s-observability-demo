@@ -1,0 +1,20 @@
+# observability/otel-collector/config.yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  logging:
+    loglevel: debug
+  otlp:
+    endpoint: tempo.default.svc.cluster.local:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp, logging]

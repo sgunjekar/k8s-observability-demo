@@ -1,0 +1,17 @@
+server:
+  ha:
+    enabled: false
+  dev:
+    enabled: false
+  dataStorage:
+    enabled: true
+    size: 1Gi
+    storageClass: standard
+  standalone:
+    enabled: true
+
+injector:
+  enabled: true
+
+ui:
+  enabled: true

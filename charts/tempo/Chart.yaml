@@ -1,0 +1,7 @@
+# Placeholder for Chart.yaml
+apiVersion: v2
+name: tempo
+description: Helm chart to deploy Grafana Tempo for distributed tracing
+type: application
+version: 0.1.0
+appVersion: "2.3.1"

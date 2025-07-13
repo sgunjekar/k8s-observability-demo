@@ -1,0 +1,33 @@
+{
+  "id": null,
+  "title": "MongoDB Failure Dashboard",
+  "timezone": "browser",
+  "panels": [
+    {
+      "title": "MongoDB Error Rate",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(mongodb_mongod_asserts_total[5m])",
+          "legendFormat": "Error Rate",
+          "interval": ""
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+    },
+    {
+      "title": "MongoDB Connections",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "mongodb_connections{state='current'}",
+          "legendFormat": "Connections"
+        }
+      ],
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+    }
+  ],
+  "schemaVersion": 22,
+  "version": 1,
+  "refresh": "5s"
+}

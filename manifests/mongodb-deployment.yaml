@@ -1,0 +1,97 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "type": "dashboard",
+        "name": "Annotations & Alerts",
+        "enabled": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "logs",
+      "title": "MongoDB Failures by Scenario",
+      "targets": [
+        {
+          "expr": "{app=\"user-service\", level=\"error\"} | json | scenario != ''",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showLabels": true,
+        "wrapLogMessage": true,
+        "dedupStrategy": "none",
+        "enableLogDetails": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "type": "table",
+      "title": "Failure Count by Scenario",
+      "targets": [
+        {
+          "expr": "count_over_time({app=\"user-service\", level=\"error\"} | json | scenario != '' [1h]) by (scenario)",
+          "refId": "B"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "type": "trace",
+      "title": "Traces by Scenario",
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "query": "traceql: span[service.name = \"user-service\" and span.attributes.scenario != null]"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    }
+  ],
+  "schemaVersion": 37,
+  "version": 1,
+  "title": "MongoDB Failure Scenarios"
+}

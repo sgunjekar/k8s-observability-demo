@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mimir
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mimir
+  template:
+    metadata:
+      labels:
+        app: mimir
+    spec:
+      containers:
+        - name: mimir
+          image: grafana/mimir:2.10.0
+          ports:
+            - containerPort: 9009
+          volumeMounts:
+            - name: mimir-storage
+              mountPath: /data/mimir
+      volumes:
+        - name: mimir-storage
+          emptyDir: {}
