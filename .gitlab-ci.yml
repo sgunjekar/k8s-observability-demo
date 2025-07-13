@@ -1,21 +1,21 @@
 stages:
   - build
-  - push
   - commit
 
 variables:
-  DOCKER_REGISTRY: $CI_REGISTRY
-  DOCKER_REGISTRY_USER: $CI_REGISTRY_USER
-  DOCKER_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  DOCKER_REGISTRY: docker.io
+  DOCKER_REGISTRY_USER: "sushilg"
+  DOCKER_REGISTRY_PASSWORD: "Mojo#11#11"  # 🔒 For testing only
+  DOCKER_IMAGE_PREFIX: "sgunjekar"
+  COMMIT_TAG: "user-service-latest"  # Use the same tag across services for simplicity
 
 .default-job-template: &default-job-template
   before_script:
-    - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USER --password-stdin $DOCKER_REGISTRY
+    - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USER" --password-stdin $DOCKER_REGISTRY
   script:
-    - docker build -t $DOCKER_REGISTRY/$SERVICE_NAME:$CI_COMMIT_SHORT_SHA apps/$SERVICE_NAME
-    - docker push $DOCKER_REGISTRY/$SERVICE_NAME:$CI_COMMIT_SHORT_SHA
-    # Update Helm values.yaml
-    - sed -i "s|tag:.*|tag: $CI_COMMIT_SHORT_SHA|" charts/$SERVICE_NAME/values.yaml
+    - docker build -t $DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/$DOCKER_IMAGE_PREFIX/$SERVICE_NAME:$COMMIT_TAG apps/$SERVICE_NAME
+    - docker push $DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/$DOCKER_IMAGE_PREFIX/$SERVICE_NAME:$COMMIT_TAG
+    - sed -i "s|tag:.*|tag: $COMMIT_TAG|" charts/$SERVICE_NAME/values.yaml
   artifacts:
     paths:
       - "charts/$SERVICE_NAME/values.yaml"
@@ -52,7 +52,7 @@ commit-updated-tags:
     - git config --global user.name "GitLab CI"
     - git config --global user.email "ci@gitlab.com"
     - git add charts/*/values.yaml
-    - git commit -m "ci: update image tags to $CI_COMMIT_SHORT_SHA [skip ci]" || echo "No changes to commit"
+    - git commit -m "ci: update image tags to $COMMIT_TAG [skip ci]" || echo "No changes to commit"
     - git push origin $CI_COMMIT_REF_NAME
   only:
     - main
