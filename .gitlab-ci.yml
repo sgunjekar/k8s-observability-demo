@@ -1,60 +1,59 @@
 stages:
   - build
-  - commit
+  - push
 
 variables:
   DOCKER_REGISTRY: docker.io
-  DOCKER_REGISTRY_USER: "sushilg"
-  DOCKER_REGISTRY_PASSWORD: "Mojo#11#11"
+  DOCKER_USERNAME: "sushilg"
+  DOCKER_PASSWORD: "Mojo#11#11"
+  DOCKER_IMAGE_PREFIX: "sgunjekar"
 
-.default-job-template: &default-job-template
+.build-template: &build-template
   before_script:
-    - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USER" --password-stdin $DOCKER_REGISTRY
-  script:
-    - docker build -t $DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/sgunjekar:$COMMIT_TAG apps/$SERVICE_NAME
-    - docker push $DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/sgunjekar:$COMMIT_TAG
-    - sed -i "s|tag:.*|tag: $COMMIT_TAG|" charts/$SERVICE_NAME/values.yaml
-  artifacts:
-    paths:
-      - "charts/$SERVICE_NAME/values.yaml"
-  only:
-    - main
-
-user-service:
-  stage: build
-  variables:
-    SERVICE_NAME: "user-service"
-    COMMIT_TAG: "user-service-latest"
-  <<: *default-job-template
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin $DOCKER_REGISTRY
 
 order-service:
   stage: build
+  image: docker:latest
+  services:
+    - docker:dind
   variables:
     SERVICE_NAME: "order-service"
-    COMMIT_TAG: "order-service-latest"
-  <<: *default-job-template
+    IMAGE_TAG: "order-service-latest"
+  <<: *build-template
+  script:
+    - docker build -t $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG apps/$SERVICE_NAME
+
+push-order-service:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    IMAGE_TAG: "order-service-latest"
+  <<: *build-template
+  script:
+    - docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG
 
 payment-service:
   stage: build
+  image: docker:latest
+  services:
+    - docker:dind
   variables:
     SERVICE_NAME: "payment-service"
-    COMMIT_TAG: "payment-service-latest"
-  <<: *default-job-template
-
-inventory-service:
-  stage: build
-  variables:
-    SERVICE_NAME: "inventory-service"
-    COMMIT_TAG: "inventory-service-latest"
-  <<: *default-job-template
-
-commit-updated-tags:
-  stage: commit
+    IMAGE_TAG: "payment-service-latest"
+  <<: *build-template
   script:
-    - git config --global user.name "GitLab CI"
-    - git config --global user.email "ci@gitlab.com"
-    - git add charts/*/values.yaml
-    - git commit -m "ci: update image tags [skip ci]" || echo "No changes to commit"
-    - git push origin $CI_COMMIT_REF_NAME
-  only:
-    - main
+    - docker build -t $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG apps/$SERVICE_NAME
+
+push-payment-service:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    IMAGE_TAG: "payment-service-latest"
+  <<: *build-template
+  script:
+    - docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG
