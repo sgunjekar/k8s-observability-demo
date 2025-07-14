@@ -6,7 +6,8 @@ variables:
   DOCKER_REGISTRY: docker.io
   DOCKER_USERNAME: "sushilg"
   DOCKER_PASSWORD: "Mojo#11#11"
-  DOCKER_IMAGE_PREFIX: "sgunjekar"
+  LOCAL_IMAGE_PREFIX: "sgunjekar"
+  REMOTE_IMAGE_REPO: "sushilg/sgunjekar"
 
 .build-template: &build-template
   image: docker:latest
@@ -15,82 +16,71 @@ variables:
   before_script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin $DOCKER_REGISTRY
 
-# ---------- USER SERVICE ----------
-
-user-service:
-  stage: build
-  variables:
-    SERVICE_NAME: "user-service"
-    IMAGE_TAG: "user-service-latest"
+.build-and-tag: &build-and-tag
   <<: *build-template
   script:
-    - docker build -t $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG apps/$SERVICE_NAME
+    - cd apps/$SERVICE_NAME
+    - docker build -t $LOCAL_IMAGE_PREFIX/$SERVICE_NAME:latest .
+    - docker tag $LOCAL_IMAGE_PREFIX/$SERVICE_NAME:latest $REMOTE_IMAGE_REPO:$IMAGE_TAG
+    - cd ../..
 
-push-user-service:
-  stage: push
-  needs: ["user-service"]
-  variables:
-    IMAGE_TAG: "user-service-latest"
+.push-image: &push-image
   <<: *build-template
   script:
-    - docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG
-
-# ---------- ORDER SERVICE ----------
+    - docker push $REMOTE_IMAGE_REPO:$IMAGE_TAG
 
 order-service:
   stage: build
   variables:
     SERVICE_NAME: "order-service"
     IMAGE_TAG: "order-service-latest"
-  <<: *build-template
-  script:
-    - docker build -t $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG apps/$SERVICE_NAME
+  <<: *build-and-tag
 
 push-order-service:
   stage: push
   needs: ["order-service"]
   variables:
     IMAGE_TAG: "order-service-latest"
-  <<: *build-template
-  script:
-    - docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG
-
-# ---------- PAYMENT SERVICE ----------
-
-payment-service:
-  stage: build
-  variables:
-    SERVICE_NAME: "payment-service"
-    IMAGE_TAG: "payment-service-latest"
-  <<: *build-template
-  script:
-    - docker build -t $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG apps/$SERVICE_NAME
-
-push-payment-service:
-  stage: push
-  needs: ["payment-service"]
-  variables:
-    IMAGE_TAG: "payment-service-latest"
-  <<: *build-template
-  script:
-    - docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG
-
-# ---------- INVENTORY SERVICE ----------
+  <<: *push-image
 
 inventory-service:
   stage: build
   variables:
     SERVICE_NAME: "inventory-service"
     IMAGE_TAG: "inventory-service-latest"
-  <<: *build-template
-  script:
-    - docker build -t $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG apps/$SERVICE_NAME
+  <<: *build-and-tag
 
 push-inventory-service:
   stage: push
   needs: ["inventory-service"]
   variables:
     IMAGE_TAG: "inventory-service-latest"
-  <<: *build-template
-  script:
-    - docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_PREFIX:$IMAGE_TAG
+  <<: *push-image
+
+user-service:
+  stage: build
+  variables:
+    SERVICE_NAME: "user-service"
+    IMAGE_TAG: "user-service-latest"
+  <<: *build-and-tag
+
+push-user-service:
+  stage: push
+  needs: ["user-service"]
+  variables:
+    IMAGE_TAG: "user-service-latest"
+  <<: *push-image
+
+payment-service:
+  stage: build
+  variables:
+    SERVICE_NAME: "payment-service"
+    IMAGE_TAG: "payment-service-latest"
+  <<: *build-and-tag
+
+push-payment-service:
+  stage: push
+  needs: ["payment-service"]
+  variables:
+    IMAGE_TAG: "payment-service-latest"
+  <<: *push-image
