@@ -1,86 +1,67 @@
 stages:
   - build
-  - push
 
 variables:
   DOCKER_REGISTRY: docker.io
   DOCKER_USERNAME: "sushilg"
   DOCKER_PASSWORD: "Mojo#11#11"
-  LOCAL_IMAGE_PREFIX: "sgunjekar"
-  REMOTE_IMAGE_REPO: "sushilg/sgunjekar"
+  DOCKER_IMAGE_PREFIX: "sgunjekar"
 
-.build-template: &build-template
+.build-and-push: &build-and-push
   image: docker:latest
   services:
     - docker:dind
   before_script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin $DOCKER_REGISTRY
 
-.build-and-tag: &build-and-tag
-  <<: *build-template
-  script:
-    - cd apps/$SERVICE_NAME
-    - docker build -t $LOCAL_IMAGE_PREFIX/$SERVICE_NAME:latest .
-    - docker tag $LOCAL_IMAGE_PREFIX/$SERVICE_NAME:latest $REMOTE_IMAGE_REPO:$IMAGE_TAG
-    - cd ../..
-
-.push-image: &push-image
-  <<: *build-template
-  script:
-    - docker push $REMOTE_IMAGE_REPO:$IMAGE_TAG
-
 order-service:
   stage: build
   variables:
     SERVICE_NAME: "order-service"
-    IMAGE_TAG: "order-service-latest"
-  <<: *build-and-tag
-
-push-order-service:
-  stage: push
-  needs: ["order-service"]
-  variables:
-    IMAGE_TAG: "order-service-latest"
-  <<: *push-image
+    IMAGE_NAME: "sgunjekar/order-service:latest"
+    REMOTE_IMAGE_TAG: "sushilg/sgunjekar:order-service-latest"
+  <<: *build-and-push
+  script:
+    - cd apps/$SERVICE_NAME
+    - docker build -t $IMAGE_NAME .
+    - docker tag $IMAGE_NAME $REMOTE_IMAGE_TAG
+    - docker push $REMOTE_IMAGE_TAG
 
 inventory-service:
   stage: build
   variables:
     SERVICE_NAME: "inventory-service"
-    IMAGE_TAG: "inventory-service-latest"
-  <<: *build-and-tag
-
-push-inventory-service:
-  stage: push
-  needs: ["inventory-service"]
-  variables:
-    IMAGE_TAG: "inventory-service-latest"
-  <<: *push-image
+    IMAGE_NAME: "sgunjekar/inventory-service:latest"
+    REMOTE_IMAGE_TAG: "sushilg/sgunjekar:inventory-service-latest"
+  <<: *build-and-push
+  script:
+    - cd apps/$SERVICE_NAME
+    - docker build -t $IMAGE_NAME .
+    - docker tag $IMAGE_NAME $REMOTE_IMAGE_TAG
+    - docker push $REMOTE_IMAGE_TAG
 
 user-service:
   stage: build
   variables:
     SERVICE_NAME: "user-service"
-    IMAGE_TAG: "user-service-latest"
-  <<: *build-and-tag
-
-push-user-service:
-  stage: push
-  needs: ["user-service"]
-  variables:
-    IMAGE_TAG: "user-service-latest"
-  <<: *push-image
+    IMAGE_NAME: "sgunjekar/user-service:latest"
+    REMOTE_IMAGE_TAG: "sushilg/sgunjekar:user-service-latest"
+  <<: *build-and-push
+  script:
+    - cd apps/$SERVICE_NAME
+    - docker build -t $IMAGE_NAME .
+    - docker tag $IMAGE_NAME $REMOTE_IMAGE_TAG
+    - docker push $REMOTE_IMAGE_TAG
 
 payment-service:
   stage: build
   variables:
     SERVICE_NAME: "payment-service"
-    IMAGE_TAG: "payment-service-latest"
-  <<: *build-and-tag
-
-push-payment-service:
-  stage: push
-  needs: ["payment-service"]
-  variables:
-    IMAGE_TAG: "payment-service-latest"
-  <<: *push-image
+    IMAGE_NAME: "sgunjekar/payment-service:latest"
+    REMOTE_IMAGE_TAG: "sushilg/sgunjekar:payment-service-latest"
+  <<: *build-and-push
+  script:
+    - cd apps/$SERVICE_NAME
+    - docker build -t $IMAGE_NAME .
+    - docker tag $IMAGE_NAME $REMOTE_IMAGE_TAG
+    - docker push $REMOTE_IMAGE_TAG
